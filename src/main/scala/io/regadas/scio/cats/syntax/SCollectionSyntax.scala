@@ -7,7 +7,7 @@ import com.spotify.scio.coders._
 import com.spotify.scio.values._
 
 /**
-  * [[SCollection]] functions that operate over F[_] types.
+  * [[com.spotify.scio.values.SCollection]] functions that operate over F[_] types.
   */
 final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
     extends AnyVal {
@@ -293,9 +293,7 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
 }
 
 /**
-  * <span class="badge badge-red" style="float: right;">EXPERIMENTAL</span>
-  *
-  * [[SCollection]] functions that operate over nested F[_] types.
+  * [[com.spotify.scio.values.SCollection]] functions that operate over F[G[_]] types.
   */
 final class SCollectionNestedOps[F[_], G[_], A](
     private val coll: SCollection[F[G[A]]]
