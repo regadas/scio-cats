@@ -64,5 +64,10 @@ lazy val `scio-cats` = project
       ScioCore % Provided,
       ScioTest % Test,
       ScalaTest % Test
-    )
+    ),
+    git.remoteRepo := "git@github.com:regadas/scio-cats.git"
+  )
+  .enablePlugins(
+    SiteScaladocPlugin,
+    GhpagesPlugin
   )

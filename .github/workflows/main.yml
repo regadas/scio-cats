@@ -155,7 +155,7 @@ jobs:
       - run: .github/scripts/gpg-setup.sh
         env:
           GPG_SECRET: ${{ secrets.GPG_SECRET }}
-      - run: sbt +publishSigned sonatypeBundleRelease
+      - run: sbt +publishSigned sonatypeBundleRelease ghpagesPushSite
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
