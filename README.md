@@ -16,9 +16,22 @@ libraryDependencies ++= Seq(
 )
 ```
 
-### Example
+### Examples
+
+These are just few examples that show some of nicities of the added functions. Most of these functions have scaladoc with an example. Have a [look](https://gh.regadas.io/scio-cats/latest/api/io/regadas/scio/cats/syntax/SCollectionOps.html).
+
+#### Maping and filtering of `F[A]`
 
 ```scala
+// before
+
+scioContext
+  .parallelize(Seq(Some(1), None, Some(2)))
+  .map(_.map(_ + 1)) // Some(2), None, Some(3)
+  .filter(_.exists(_ > 2)) // Some(3)
+
+// after
+
 import cats.implicits._
 import io.regadas.scio.cats.syntax._
 
@@ -26,4 +39,43 @@ scioContext
   .parallelize(Seq(Some(1), None, Some(2)))
   .map_(_ + 1) // Some(2), None, Some(3)
   .filter_(_ > 2) // Some(3)
+```
+
+#### Creating tuples over `F[A]`
+
+```scala
+// before
+scioContext
+  .parallelize(Seq(Some(1), None, Some(2)))
+  // here you could also use `cats` but it doesn't look as nice
+  // .map(_.tupleRight(1))
+  .map(_.map(_ -> 1)) // Some((1, 1)), Some((2, 1))
+
+// after
+
+import cats.implicits._
+import io.regadas.scio.cats.syntax._
+
+scioContext
+  .parallelize(Seq(Some(1), None, Some(2)))
+  // tupleLeft is also available
+  .tupleRight(1) // Some((1, 1)), Some((2, 1))
+```
+
+#### Output to the console (similar to `debug`)
+
+```scala
+// before
+scioContext
+  .parallelize(Seq(Some(1), None, Some(2)))
+  .debug() // it will use toString()
+
+// after
+
+import cats.implicits._
+import io.regadas.scio.cats.syntax._
+
+scioContext
+  .parallelize(Seq(Some(1), None, Some(2)))
+  .showStdOut // leverages Show type class
 ```
