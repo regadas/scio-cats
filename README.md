@@ -24,7 +24,6 @@ import io.regadas.scio.cats.syntax._
 
 scioContext
   .parallelize(Seq(Some(1), None, Some(2)))
-  .mapF(_ + 1) // Some(2), None, Some(3)
-  .filterF(_ > 2) // None, None, Some(3)
-  .nonEmptyF // Some(3)
+  .map_(_ + 1) // Some(2), None, Some(3)
+  .filter_(_ > 2) // Some(3)
 ```

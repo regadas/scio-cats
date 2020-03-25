@@ -40,92 +40,92 @@ class SCollectionSyntaxTest extends PipelineSpec {
     }
   }
 
-  it should "support mapF" in {
+  it should "support map_" in {
     runWithContext { sc =>
       val data = Seq(Option(1))
       val expected = Seq(Option(2))
 
-      val result = sc.parallelize(data).mapF(_ + 1)
+      val result = sc.parallelize(data).map_(_ + 1)
       result should containInAnyOrder(expected)
 
       val listData = Seq(List(1, 2, 3), List(4, 5, 6))
       val expectedList = Seq(List(2, 3, 4), List(5, 6, 7))
 
-      val resultList = sc.parallelize(listData).mapF(_ + 1)
+      val resultList = sc.parallelize(listData).map_(_ + 1)
       resultList should containInAnyOrder(expectedList)
     }
   }
 
-  it should "support flatMapF" in {
+  it should "support flatMap_" in {
     runWithContext { sc =>
       val m: Map[Int, String] = Map(1 -> "one", 3 -> "three")
       val data = Seq(Option(1), Option(2), None)
       val expected = Seq(Some("one"), None, None)
 
-      val result = sc.parallelize(data).flatMapF(m.get)
+      val result = sc.parallelize(data).flatMap_(m.get)
       result should containInAnyOrder(expected)
     }
   }
 
-  it should "support mapFilterF" in {
+  it should "support mapFilter" in {
     runWithContext { sc =>
       val m: Map[Int, String] = Map(1 -> "one", 3 -> "three")
       val data = Seq(Option(1), Option(2), None)
       val expected = Seq(Some("one"), None, None)
 
-      val result = sc.parallelize(data).mapFilterF(m.get)
+      val result = sc.parallelize(data).mapFilter(m.get)
       result should containInAnyOrder(expected)
 
       val listData = Seq(List(1, 2, 3), List(4, 5, 6))
       val expectedList = Seq(List("one", "three"), List())
 
-      val resultList = sc.parallelize(listData).mapFilterF(m.get)
+      val resultList = sc.parallelize(listData).mapFilter(m.get)
       resultList should containInAnyOrder(expectedList)
     }
   }
 
-  it should "support filterF" in {
+  it should "support ffilter" in {
     runWithContext { sc =>
       val data = Seq(Option(1), Option(2), None)
       val expected = Seq(Option(1), None, None)
 
-      val result = sc.parallelize(data).filterF(_ <= 1)
+      val result = sc.parallelize(data).ffilter(_ <= 1)
       result should containInAnyOrder(expected)
 
       val listData = Seq(List(1, 2, 3), List(4, 5, 6))
       val expectedList = Seq(List(1), List())
 
-      val resultList = sc.parallelize(listData).filterF(_ <= 1)
+      val resultList = sc.parallelize(listData).ffilter(_ <= 1)
       resultList should containInAnyOrder(expectedList)
     }
   }
 
-  it should "support nonEmptyF" in {
+  it should "support nonEmpty" in {
     runWithContext { sc =>
       val data = Seq(Option(1), Option(2), None)
       val expected = Seq(Option(1))
 
-      val result = sc.parallelize(data).nonEmptyF(_ <= 1)
+      val result = sc.parallelize(data).nonEmpty(_ <= 1)
       result should containInAnyOrder(expected)
     }
   }
 
-  it should "support emptyF" in {
+  it should "support empty" in {
     runWithContext { sc =>
       val data = Seq(List(1, 2, 3), List(2, 2))
       val expected = Seq(List[Int]())
 
-      val result = sc.parallelize(data).emptyF(_ <= 1)
+      val result = sc.parallelize(data).empty(_ <= 1)
       result should containInAnyOrder(expected)
     }
   }
 
-  it should "support collectF" in {
+  it should "support collect_" in {
     runWithContext { sc =>
       val data = Seq(List(1, 2, 3, 4))
       val expected = Seq(List.empty[String])
 
-      val result = sc.parallelize(data).collectF {
+      val result = sc.parallelize(data).collect_ {
         case 0 => "one"
       }
 
@@ -133,18 +133,18 @@ class SCollectionSyntaxTest extends PipelineSpec {
     }
   }
 
-  it should "support productF" in {
+  it should "support fproduct" in {
     runWithContext { sc =>
       val data = Seq(Option(1))
       val expected = Seq(Option((1, 2)))
 
-      val result = sc.parallelize(data).productF(_ + 1)
+      val result = sc.parallelize(data).fproduct(_ + 1)
 
       result should containInAnyOrder(expected)
     }
   }
 
-  it should "support mproductF" in {
+  it should "support mproduct" in {
     runWithContext { sc =>
       val data = Seq(List("12", "34", "56"))
       val expected =
@@ -159,16 +159,16 @@ class SCollectionSyntaxTest extends PipelineSpec {
           )
         )
 
-      val result = sc.parallelize(data).mproductF(_.toList)
+      val result = sc.parallelize(data).mproduct(_.toList)
       result should containInAnyOrder(expected)
     }
   }
 
-  it should "support mapF nested" in {
+  it should "support map_ nested" in {
     runWithContext { sc =>
       val data = Seq(List(Some(1), None, Some(2)))
       val expected = Seq(List(Some(2), None, Some(3)))
-      val result = sc.parallelize(data).mapF(_ + 1)
+      val result = sc.parallelize(data).map_(_ + 1)
 
       result should containInAnyOrder(expected)
     }
@@ -203,6 +203,18 @@ class SCollectionSyntaxTest extends PipelineSpec {
       val data = Seq(List(Option(1), Option(2)))
       val expected: Seq[Option[List[Int]]] = Seq(Some(List(1, 2)))
       val result = sc.parallelize(data).sequence
+
+      result should containInAnyOrder(expected)
+    }
+  }
+
+  it should "support combine_" in {
+    runWithContext { sc =>
+      import cats._
+
+      val data: Seq[Id[Int]] = Seq(1, 2)
+      val expected = Seq(3)
+      val result = sc.parallelize(data).combine_
 
       result should containInAnyOrder(expected)
     }
