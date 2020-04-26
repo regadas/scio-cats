@@ -6,6 +6,13 @@
 
 `scio-cats` is a collection of additional functions for [scio](https://github.com/spotify/scio) [SCollection](https://javadoc.io/static/com.spotify/scio-core_2.12/0.8.3/com/spotify/scio/values/SCollection.html) that leverage [cats](https://typelevel.org/cats) type classes and data types.
 
+## Compatibility table
+
+| scio-cats | scio  |
+|-----------|-------|
+| 0.1.1     | 0.8.4 |
+| 0.1.0     | 0.8.3 |
+
 ## Quick Start
 
 To use `scio-cats` add the following dependencies to your `build.sbt`:
