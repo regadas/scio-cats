@@ -1,6 +1,6 @@
 import Dependencies._
 
-ThisBuild / scalaVersion := "2.12.11"
+ThisBuild / scalaVersion := "2.13.2"
 ThisBuild / organization := "io.regadas"
 ThisBuild / organizationName := "regadas"
 ThisBuild / licenses := Seq(
@@ -52,12 +52,15 @@ lazy val `scio-cats` = project
       "-Ywarn-unused",
       "-Xfatal-warnings",
       "-deprecation",
-      "-Xlint",
-      "-Yno-adapted-args",
-      "-Ypartial-unification",
-      "-Xfuture"
-    ),
-    crossScalaVersions := Seq("2.11.12", scalaVersion.value),
+      "-Xlint"
+    ) ++ {
+      if (scalaVersion.value.startsWith("2.12")) {
+        Seq("-Ypartial-unification")
+      } else {
+        Seq()
+      }
+    },
+    crossScalaVersions := Seq("2.12.11", scalaVersion.value),
     libraryDependencies ++= Seq(
       CatsCore,
       KindProjector,
