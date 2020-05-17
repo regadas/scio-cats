@@ -190,8 +190,8 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
     * res0: SCollection[List[Int]](List(2, 3))
     * }}}
     */
-  def nonEmpty(p: A => Boolean)(
-      implicit F: FunctorFilter[F],
+  def nonEmpty(p: A => Boolean)(implicit
+      F: FunctorFilter[F],
       FF: Foldable[F],
       c: Coder[F[A]]
   ): SCollection[F[A]] =
@@ -212,8 +212,8 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
     * scala> coll.empty(_ > 1)
     * }}}
     */
-  def empty(p: A => Boolean)(
-      implicit F: FunctorFilter[F],
+  def empty(p: A => Boolean)(implicit
+      F: FunctorFilter[F],
       FF: Foldable[F],
       c: Coder[F[A]]
   ): SCollection[F[A]] =
@@ -228,22 +228,22 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   /**
     * Filter the elements that satisfy a predicate.
     */
-  def filter_(p: A => Boolean)(
-      implicit F: FunctorFilter[F],
+  def filter_(p: A => Boolean)(implicit
+      F: FunctorFilter[F],
       FF: Foldable[F],
       c: Coder[F[A]]
   ): SCollection[F[A]] =
     coll.nonEmpty(p)
 
-  def minOption(
-      implicit F: Foldable[F],
+  def minOption(implicit
+      F: Foldable[F],
       o: Order[A],
       c: Coder[Option[A]]
   ): SCollection[Option[A]] =
     coll.map(F.minimumOption(_))
 
-  def maxOption(
-      implicit F: Foldable[F],
+  def maxOption(implicit
+      F: Foldable[F],
       o: Order[A],
       c: Coder[Option[A]]
   ): SCollection[Option[A]] =
@@ -277,8 +277,8 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
     * res0: SCollection[List[Option[Int]]](List(Some(1), Some(2), Some(3), None))
     * }}}
     */
-  def flatTraverse[G[_], B](f: A => G[F[B]])(
-      implicit T: Traverse[F],
+  def flatTraverse[G[_], B](f: A => G[F[B]])(implicit
+      T: Traverse[F],
       F: FlatMap[F],
       G: Applicative[G],
       coder: Coder[G[F[B]]]
@@ -288,8 +288,8 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   /**
     * Fold implemented using the given Monoid[A] instance.
     */
-  def foldF(
-      implicit F: Foldable[F],
+  def foldF(implicit
+      F: Foldable[F],
       M: CommutativeMonoid[A],
       c: Coder[A]
   ): SCollection[A] =
@@ -303,10 +303,13 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
     * will be outputed in the [[org.apache.beam.sdk.transforms.windowing.GlobalWindow]] if the
     * input is empty.
     */
-  def combine_(implicit M: CommutativeMonoid[F[A]], C: Coder[F[A]]) =
+  def combine_(implicit
+      M: CommutativeMonoid[F[A]],
+      C: Coder[F[A]]
+  ): SCollection[F[A]] =
     coll.applyTransform(Combine.globally(new BinaryCombineFn[F[A]]() {
       override def defaultValue(): F[A] = M.empty
-      override def apply(left: F[A], right: F[A]) = M.combine(left, right)
+      override def apply(left: F[A], right: F[A]): F[A] = M.combine(left, right)
     }))
 
   /**
@@ -321,14 +324,14 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
 }
 
 /**
-  * [[com.spotify.scio.values.SCollection]] functions that operate over F[G[_]] types.
+  * [[com.spotify.scio.values.SCollection]] functions that operate over `F[G[_]]` types.
   */
 final class SCollectionNestedOps[F[_], G[_], A](
     private val coll: SCollection[F[G[A]]]
 ) extends AnyVal {
 
-  def map_[B](f: A => B)(
-      implicit N: Functor[Nested[F, G, ?]],
+  def map_[B](f: A => B)(implicit
+      N: Functor[Nested[F, G, ?]],
       coder: Coder[F[G[B]]]
   ): SCollection[F[G[B]]] =
     coll.map(n => N.map(Nested(n))(f).value)
@@ -344,8 +347,8 @@ final class SCollectionNestedOps[F[_], G[_], A](
     * res0: SCollection[Option[List[Int]]](Some(List(1, 2)))
     * }}}
     */
-  def sequence(
-      implicit T: Traverse[F],
+  def sequence(implicit
+      T: Traverse[F],
       G: Applicative[G],
       coder: Coder[G[F[A]]]
   ): SCollection[G[F[A]]] =
