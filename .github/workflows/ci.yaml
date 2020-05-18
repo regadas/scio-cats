@@ -1,0 +1,85 @@
+jobs:
+  build:
+    name: Build
+    needs:
+      - checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "actions/checkout@v2.1.0"
+      - run: |
+          shasum build.sbt \
+            project/plugins.sbt \
+            project/build.properties \
+            project/Dependencies.scala > gha.cache.tmp
+      - name: "~/.sbt cache"
+        uses: "actions/cache@v1"
+        with:
+          key: "${{ runner.os }}-sbt-${{ hashFiles('gha.cache.tmp') }}"
+          path: "~/.sbt"
+          restore-keys: sbt
+      - name: "~/.cache/coursier cache"
+        uses: "actions/cache@v1"
+        with:
+          key: "${{ runner.os }}-coursier-${{ hashFiles('gha.cache.tmp') }}"
+          path: "~/.cache/coursier"
+          restore-keys: coursier
+      - name: java 11 setup
+        uses: "actions/setup-java@v1"
+        with:
+          architecture: x64
+          java-package: jdk
+          java-version: '11'
+      - run: "sbt \"++${{ matrix.scala}} test\""
+      - env:
+          GPG_SECRET: "${{ secrets.GPG_SECRET }}"
+        run: ".github/scripts/gpg-setup.sh"
+      - env:
+          PGP_PASSPHRASE: "${{ secrets.PGP_PASSPHRASE }}"
+          SONATYPE_PASSWORD: "${{ secrets.SONATYPE_PASSWORD }}"
+          SONATYPE_USERNAME: "${{ secrets.SONATYPE_USERNAME }}"
+        if: "github.event_name == 'push' && github.ref == 'refs/heads/master'"
+        run: "sbt +publishSigned"
+      - env:
+          PGP_PASSPHRASE: "${{ secrets.PGP_PASSPHRASE }}"
+          SONATYPE_PASSWORD: "${{ secrets.SONATYPE_PASSWORD }}"
+          SONATYPE_USERNAME: "${{ secrets.SONATYPE_USERNAME }}"
+        if: "github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')"
+        run: "sbt +publishSigned sonatypeBundleRelease ghpagesPushSite"
+    strategy:
+      matrix:
+        scala:
+          - '2.12.11'
+          - '2.13.1'
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "actions/checkout@v2.1.0"
+      - run: |
+          shasum build.sbt \
+            project/plugins.sbt \
+            project/build.properties \
+            project/Dependencies.scala > gha.cache.tmp
+      - name: "~/.sbt cache"
+        uses: "actions/cache@v1"
+        with:
+          key: "${{ runner.os }}-sbt-${{ hashFiles('gha.cache.tmp') }}"
+          path: "~/.sbt"
+          restore-keys: sbt
+      - name: "~/.cache/coursier cache"
+        uses: "actions/cache@v1"
+        with:
+          key: "${{ runner.os }}-coursier-${{ hashFiles('gha.cache.tmp') }}"
+          path: "~/.cache/coursier"
+          restore-keys: coursier
+      - name: java 11 setup
+        uses: "actions/setup-java@v1"
+        with:
+          architecture: x64
+          java-package: jdk
+          java-version: '11'
+      - run: sbt scalafmtCheckAll scalafmtSbtCheck
+name: ci
+on:
+  pull_request: {}
+  push: {}

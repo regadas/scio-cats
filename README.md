@@ -1,6 +1,6 @@
 # scio-cats
 
-![build](https://github.com/regadas/scio-cats/workflows/main/badge.svg)
+![build](https://github.com/regadas/scio-cats/workflows/ci/badge.svg)
 [![GitHub license](https://img.shields.io/github/license/regadas/scio-cats.svg)](./LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/io.regadas/scio-cats_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/io.regadas/scio-cats_2.12)
 
