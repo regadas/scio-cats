@@ -1,6 +1,6 @@
 package io.regadas.scio.cats.syntax
 
-import cats.implicits._
+import cats.syntax.all._
 import com.spotify.scio.testing._
 
 import scala.util.Try
