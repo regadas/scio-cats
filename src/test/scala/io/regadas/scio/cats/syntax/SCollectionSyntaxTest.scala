@@ -125,8 +125,8 @@ class SCollectionSyntaxTest extends PipelineSpec {
       val data = Seq(List(1, 2, 3, 4))
       val expected = Seq(List.empty[String])
 
-      val result = sc.parallelize(data).collect_ {
-        case 0 => "one"
+      val result = sc.parallelize(data).collect_ { case 0 =>
+        "one"
       }
 
       result should containInAnyOrder(expected)
