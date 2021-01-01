@@ -309,7 +309,7 @@ final class SCollectionNestedOps[F[_], G[_], A](
 ) extends AnyVal {
 
   def map_[B](f: A => B)(implicit
-      N: Functor[Nested[F, G, ?]],
+      N: Functor[Nested[F, G, *]],
       coder: Coder[F[G[B]]]
   ): SCollection[F[G[B]]] =
     coll.map(n => N.map(Nested(n))(f).value)
