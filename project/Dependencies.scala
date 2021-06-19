@@ -2,8 +2,8 @@ import sbt._
 
 object Dependencies {
   val ScalaTestVersion = "3.2.7"
-  val KindProjectorVersion = "0.11.3"
   val CatsVersion = "2.6.1"
+  val KindProjectorVersion = "0.13.0"
   val ScioVersion = "0.10.2"
 
   lazy val ScalaTest = "org.scalatest" %% "scalatest" % ScalaTestVersion
