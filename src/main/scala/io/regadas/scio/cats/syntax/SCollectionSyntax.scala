@@ -11,7 +11,8 @@ import org.apache.beam.sdk.transforms.Combine.BinaryCombineFn
 import cats.Show
 import java.io.PrintStream
 
-/** [[com.spotify.scio.values.SCollection]] functions that operate over F[_] types.
+/** [[com.spotify.scio.values.SCollection]] functions that operate over F[_]
+  * types.
   */
 final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
     extends AnyVal {
@@ -31,7 +32,8 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   )(implicit F: Functor[F], coder: Coder[F[B]]): SCollection[F[B]] =
     coll.map(F.as(_, b))
 
-  /** Tuples the `A` value in `F[A]` with the supplied `B` value, with the `B` value on the left.
+  /** Tuples the `A` value in `F[A]` with the supplied `B` value, with the `B`
+    * value on the left.
     *
     * Example:
     * {{{
@@ -45,10 +47,10 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   )(implicit F: Functor[F], coder: Coder[F[(B, A)]]): SCollection[F[(B, A)]] =
     coll.map(F.tupleLeft(_, b))
 
-  /** Tuples the `A` value in `F[A]` with the supplied `B` value, with the `B` value on the right.
+  /** Tuples the `A` value in `F[A]` with the supplied `B` value, with the `B`
+    * value on the right.
     *
-    * Example:
-    * Example:
+    * Example: Example:
     * {{{
     * scala> val coll: SCollection[List[String]] = sc.paralelize(Seq(List("hello", "world")))
     * scala> coll.tupleRight(42)
@@ -64,7 +66,7 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
     *
     * {{{
     * scala> val coll: SCollection[Map[Int, String]] =
-    *          sc.paralelize(Seq(Map(1 -> "hi", 2 -> "there", 3 -> "you")))
+    *           sc.paralelize(Seq(Map(1 -> "hi", 2 -> "there", 3 -> "you")))
     * scala> coll.map_(_ ++ "!")
     * res0: SCollection[Map[Int, String]](Map(1 -> hi!, 2 -> there!, 3 -> you!))
     * }}}
@@ -74,16 +76,17 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   )(implicit F: Functor[F], coder: Coder[F[B]]): SCollection[F[B]] =
     coll.map(F.map(_)(f))
 
-  /** Allows us to have a value in a context (F[A]) and then feed that into a function that takes
-    * a normal value and returns a value in a context (A => F[B]).
+  /** Allows us to have a value in a context (F[A]) and then feed that into a
+    * function that takes a normal value and returns a value in a context (A =>
+    * F[B]).
     */
   def flatMap_[B](
       f: A => F[B]
   )(implicit F: FlatMap[F], coder: Coder[F[B]]): SCollection[F[B]] =
     coll.map(F.flatMap(_)(f))
 
-  /** Tuple the values in fa with the result of applying a function
-    * with the value
+  /** Tuple the values in fa with the result of applying a function with the
+    * value
     *
     * Example:
     * {{{
@@ -111,9 +114,9 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   )(implicit F: FlatMap[F], coder: Coder[F[(A, B)]]): SCollection[F[(A, B)]] =
     coll.map(F.mproduct(_)(f))
 
-  /** A combined `map` and `filter`. Filtering is handled via `Option`
-    * instead of `Boolean` such that the output type `B` can be different than
-    * the input type `A`.
+  /** A combined `map` and `filter`. Filtering is handled via `Option` instead
+    * of `Boolean` such that the output type `B` can be different than the input
+    * type `A`.
     *
     * Example:
     * {{{
@@ -150,8 +153,8 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
     coll.transform(_.map(FF.toList).flatMap(identity))
 
   /** Apply a filter to a structure such that the output structure contains all
-    * `A` elements in the input structure that satisfy the predicate `f` but none
-    * that don't.
+    * `A` elements in the input structure that satisfy the predicate `f` but
+    * none that don't.
     *
     * Example:
     * {{{
@@ -169,7 +172,8 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   )(implicit F: FunctorFilter[F], c: Coder[F[A]]): SCollection[F[A]] =
     coll.map(F.filter(_)(p))
 
-  /** Similar to [[ffilter]] but filters all non empty `F[A]` that satisfy the predicate.
+  /** Similar to [[ffilter]] but filters all non empty `F[A]` that satisfy the
+    * predicate.
     *
     * Example:
     * {{{
@@ -190,7 +194,8 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   def nonEmpty(implicit FF: Foldable[F]): SCollection[F[A]] =
     coll.filter(FF.nonEmpty)
 
-  /** Similar to [[ffilter]] but filters all empty `F[A]` that satisfy the predicate.
+  /** Similar to [[ffilter]] but filters all empty `F[A]` that satisfy the
+    * predicate.
     *
     * Example:
     * {{{
@@ -233,9 +238,9 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   ): SCollection[Option[A]] =
     coll.map(F.maximumOption(_))
 
-  /** Given a function which returns a G effect, thread this effect
-    * through the running of this function on all the values in F,
-    * returning an F[B] in a G context.
+  /** Given a function which returns a G effect, thread this effect through the
+    * running of this function on all the values in F, returning an F[B] in a G
+    * context.
     *
     * Example:
     * {{{
@@ -276,12 +281,14 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   ): SCollection[A] =
     coll.map(F.fold(_))
 
-  /** Combines all the elements in each window of the input into a single value in the output.
+  /** Combines all the elements in each window of the input into a single value
+    * in the output.
     *
     * <p>If the input [[com.spotify.scio.values.SCollection]] is windowed into
-    * [[org.apache.beam.sdk.transforms.windowing.GlobalWindows]], [[cats.kernel.CommutativeMonoid]] empty
-    * will be outputed in the [[org.apache.beam.sdk.transforms.windowing.GlobalWindow]] if the
-    * input is empty.
+    * [[org.apache.beam.sdk.transforms.windowing.GlobalWindows]],
+    * [[cats.kernel.CommutativeMonoid]] empty will be outputed in the
+    * [[org.apache.beam.sdk.transforms.windowing.GlobalWindow]] if the input is
+    * empty.
     */
   def combine_(implicit
       M: CommutativeMonoid[F[A]],
@@ -292,9 +299,11 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
       override def apply(left: F[A], right: F[A]): F[A] = M.combine(left, right)
     }))
 
-  /** Writes to the supplied `PrintStream`, converting each element to a `String` via `Show`.
+  /** Writes to the supplied `PrintStream`, converting each element to a
+    * `String` via `Show`.
     *
-    * @param out PrintStream to write the elements to.
+    * @param out
+    *   PrintStream to write the elements to.
     */
   def show(out: PrintStream)(implicit S: Show[F[A]]): SCollection[F[A]] =
     coll.tap(e => out.println(S.show(e)))
@@ -302,7 +311,8 @@ final class SCollectionOps[F[_], A](private val coll: SCollection[F[A]])
   def showStdOut(implicit S: Show[F[A]]): SCollection[F[A]] = show(Console.out)
 }
 
-/** [[com.spotify.scio.values.SCollection]] functions that operate over `F[G[_]]` types.
+/** [[com.spotify.scio.values.SCollection]] functions that operate over
+  * `F[G[_]]` types.
   */
 final class SCollectionNestedOps[F[_], G[_], A](
     private val coll: SCollection[F[G[A]]]
@@ -314,8 +324,8 @@ final class SCollectionNestedOps[F[_], G[_], A](
   ): SCollection[F[G[B]]] =
     coll.map(n => N.map(Nested(n))(f).value)
 
-  /** Thread all the G effects through the F structure to invert the
-    * structure from `F[G[A]]` to `G[F[A]]`.
+  /** Thread all the G effects through the F structure to invert the structure
+    * from `F[G[A]]` to `G[F[A]]`.
     *
     * Example:
     * {{{
