@@ -60,7 +60,7 @@ lazy val `scio-cats` = project
         Seq()
       }
     },
-    crossScalaVersions := Seq("2.12.14", scalaVersion.value),
+    crossScalaVersions := Seq("2.12.17", scalaVersion.value),
     libraryDependencies ++= Seq(
       CatsCore,
       KindProjector,
